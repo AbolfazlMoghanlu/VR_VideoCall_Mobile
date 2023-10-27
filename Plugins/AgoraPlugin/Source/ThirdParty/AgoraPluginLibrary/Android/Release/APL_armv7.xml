@@ -17,36 +17,7 @@
 			<setBool result="bSupported" value="true"/>
 		</isArch>
 	</init>
-	
-	<soLoadLibrary>
-	<if condition="bSupported">
-			<true>
-				<loadLibrary name="libagora-fdkaac" failmsg="Failed to load libagora-fdkaac" />
-				<loadLibrary name="libagora-ffmpeg" failmsg="Failed to load libagora-ffmpeg" />
-				<loadLibrary name="libagora-rtc-sdk" failmsg="Failed to load libagora-rtc-sdk" />
-				<loadLibrary name="libagora-soundtouch" failmsg="Failed to load libagora-soundtouch" />
-				<loadLibrary name="libagora_ai_echo_cancellation_extension" failmsg="Failed to load libagora_ai_echo_cancellation_extension" />
-				<loadLibrary name="libagora_ai_noise_suppression_extension" failmsg="Failed to load libagora_ai_noise_suppression_extension" />
-				<loadLibrary name="libagora_audio_beauty_extension" failmsg="Failed to load libagora_audio_beauty_extension" />
-				<loadLibrary name="libagora_clear_vision_extension" failmsg="Failed to load libagora_clear_vision_extension" />
-				<loadLibrary name="libagora_content_inspect_extension" failmsg="Failed to load libagora_content_inspect_extension" />
-				<loadLibrary name="libagora_dav1d" failmsg="Failed to load libagora_dav1d" />
-				<loadLibrary name="libagora_drm_loader_extension" failmsg="Failed to load libagora_drm_loader_extension" />
-				<loadLibrary name="libagora_screen_capture_extension" failmsg="Failed to load libagora_screen_capture_extension" />
-				<loadLibrary name="libagora_segmentation_extension" failmsg="Failed to load libagora_segmentation_extension" />
-				<loadLibrary name="libagora_spatial_audio_extension" failmsg="Failed to load libagora_spatial_audio_extension" />
-				<loadLibrary name="libagora_super_resolution_extension" failmsg="Failed to load libagora_super_resolution_extension" />
-				<loadLibrary name="libagora_udrm3_extension" failmsg="Failed to load libagora_udrm3_extension" />
-				<loadLibrary name="libagora_video_quality_analyzer_extension" failmsg="Failed to load libagora_video_quality_analyzer_extension" />
 
-			</true>
-		</if>
-	</soLoadLibrary>
-	
-	<gameActivityReplacement>
-        <setString result="soLoadLibrary" value="$S(PluginDir)/Android/GameActivity.java.template" />
-	</gameActivityReplacement>
-	 
 	<gameActivityImportAdditions>
 		<insert>
 			import io.agora.rtc2.internal.RtcEngineImpl;
@@ -74,6 +45,7 @@
 	<!-- optional files or directories to copy to Intermediate/Android/APK -->
 	<resourceCopies>
 		<log text="PluginDir: $S(PluginDir)"/>
+		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora-core.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora-core.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora-fdkaac.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora-fdkaac.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora-ffmpeg.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora-ffmpeg.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora-rtc-sdk.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora-rtc-sdk.so"/>
@@ -83,15 +55,19 @@
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_audio_beauty_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_audio_beauty_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_clear_vision_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_clear_vision_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_content_inspect_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_content_inspect_extension.so"/>
-		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_dav1d.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_dav1d.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_drm_loader_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_drm_loader_extension.so"/>
+		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_face_detection_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_face_detection_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_screen_capture_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_screen_capture_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_segmentation_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_segmentation_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_spatial_audio_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_spatial_audio_extension.so"/>
-		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_super_resolution_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_super_resolution_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_udrm3_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_udrm3_extension.so"/>
+		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_video_decoder_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_video_decoder_extension.so"/>
+		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_video_encoder_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_video_encoder_extension.so"/>
 		<copyFile src="$S(PluginDir)/$S(Architecture)/libagora_video_quality_analyzer_extension.so" dst="$S(BuildDir)/libs/$S(Architecture)/libagora_video_quality_analyzer_extension.so"/>
+		<copyFile src="$S(PluginDir)/$S(Architecture)/libvideo_dec.so" dst="$S(BuildDir)/libs/$S(Architecture)/libvideo_dec.so"/>
+		<copyFile src="$S(PluginDir)/$S(Architecture)/libvideo_enc.so" dst="$S(BuildDir)/libs/$S(Architecture)/libvideo_enc.so"/>
 		<copyFile src="$S(PluginDir)/agora-rtc-sdk.jar" dst="$S(BuildDir)/libs/agora-rtc-sdk.jar" />
+		<copyFile src="$S(PluginDir)/agora-rtc-sdk-javadoc.jar" dst="$S(BuildDir)/libs/agora-rtc-sdk-javadoc.jar" />
 		<copyFile src="$S(PluginDir)/AgoraScreenShareExtension.aar" dst="$S(BuildDir)/libs/AgoraScreenShareExtension.aar" />
 	</resourceCopies>
 	<androidManifestUpdates>
@@ -104,9 +80,6 @@
 		<addPermission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 		<addPermission android:name="android.permission.BLUETOOTH"/>
 	</androidManifestUpdates>
-
-	<!-- optional libraries to load in GameActivity.java before libUE4.so -->
-
 	<buildGradleAdditions>
 		<insert>
 dependencies {

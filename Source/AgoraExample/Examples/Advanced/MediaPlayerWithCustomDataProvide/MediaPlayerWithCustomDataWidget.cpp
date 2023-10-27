@@ -2,6 +2,7 @@
 
 
 #include "MediaPlayerWithCustomDataWidget.h"
+#include "AgoraExample/Utility/BFL_UtilityTool.h"
 
 void UMediaPlayerWithCustomDataWidget::InitAgoraWidget(FString APP_ID, FString TOKEN, FString CHANNEL_NAME)
 {
