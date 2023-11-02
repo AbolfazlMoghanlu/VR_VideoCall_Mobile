@@ -66,7 +66,8 @@ void UBFL_HTTPHelper::HandleRequest(FHttpRequestPtr RequestPtr, FHttpResponsePtr
 	// 获得返回的json数据
 	TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(ResponsePtr->GetContentAsString());
 	// 把FString转成TCHAR
-	TCHAR* serializedChar = ResponsePtr->GetContentAsString().GetCharArray().GetData();
+	FString Res = ResponsePtr->GetContentAsString();
+	TCHAR* serializedChar = Res.GetCharArray().GetData();
 	
 	// solve garbled problem
 	FString myData(TCHAR_TO_UTF8(serializedChar));
