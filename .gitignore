@@ -75,4 +75,5 @@ DerivedDataCache/*
 
 #!*.dll
 !/Plugins/AgoraPlugin/Source/ThirdParty/AgoraPluginLibrary/Win/**
+!/Plugins/AgoraPlugin/Source/ThirdParty/AgoraPluginLibrary/Android/**
 

@@ -13,5 +13,7 @@ UCLASS()
 class VR_VIDEOCALL_MOBILE_API AVR_VideoCall_MobileGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
+	void InitAgoraWidget(FString APP_ID, FString TOKEN, FString CHANNEL_NAME);
 	
 };
