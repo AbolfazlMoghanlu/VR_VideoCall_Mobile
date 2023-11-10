@@ -22,7 +22,7 @@
 #include "../../../Utility/BFL_VideoViewManager.h"
 #include "../../../Utility/BFL_Logger.h"
 
-#include "AgoraVideoWidget.generated.h"
+#include "CustomAgoraVideoWidget.generated.h"
 
 using namespace agora::rtc;
 using namespace agora;
@@ -31,7 +31,7 @@ using namespace agora;
  * 
  */
 UCLASS(Abstract)
-class AGORAEXAMPLE_API UAgoraVideoWidget : public UBaseAgoraUserWidget
+class AGORAEXAMPLE_API UCustomAgoraVideoWidget : public UBaseAgoraUserWidget
 {
 	GENERATED_BODY()
 
@@ -43,7 +43,7 @@ public:
 	{
 	public:
 
-		FUserRtcEventHandler(UAgoraVideoWidget* InVideoWidget) : WidgetPtr(InVideoWidget) {};
+		FUserRtcEventHandler(UCustomAgoraVideoWidget* InVideoWidget) : WidgetPtr(InVideoWidget) {};
 
 #pragma region AgoraCallback - IRtcEngineEventHandler
 
@@ -57,13 +57,17 @@ public:
 
 		void onVideoSizeChanged(VIDEO_SOURCE_TYPE sourceType, uid_t uid, int width, int height, int rotation) override;
 
+		void onLocalVideoStateChanged(VIDEO_SOURCE_TYPE source, LOCAL_VIDEO_STREAM_STATE state, LOCAL_VIDEO_STREAM_ERROR error) override;
+
+		void onRemoteVideoStateChanged(uid_t uid, REMOTE_VIDEO_STATE state, REMOTE_VIDEO_STATE_REASON reason, int elapsed) override;
+
 #pragma endregion
 
 		inline bool IsWidgetValid() { return WidgetPtr.IsValid(); }
 
 	private:
 
-		TWeakObjectPtr<UAgoraVideoWidget> WidgetPtr;
+		TWeakObjectPtr<UCustomAgoraVideoWidget> WidgetPtr;
 
 	};
 #pragma endregion
@@ -126,6 +130,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnBtnBackToHomeClicked();
 
+	UFUNCTION(BlueprintCallable)
 	void InitAgoraWidget(FString APP_ID, FString TOKEN, FString CHANNEL_NAME) override;
 
 
@@ -153,6 +158,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UDraggableVideoViewWidget> DraggableVideoViewTemplate;
 
+
+
 protected:
 
 	int MakeVideoView(uint32 uid, agora::rtc::VIDEO_SOURCE_TYPE sourceType = VIDEO_SOURCE_CAMERA_PRIMARY, FString channelId = "");
@@ -167,7 +174,24 @@ public:
 	inline FString GetToken() { return Token; };
 	inline FString GetChannelName() { return ChannelName; };
 
+	UFUNCTION(BLueprintCallable)
+	UImage* GetRemoteImage() const;
 	
+	UFUNCTION(BLueprintCallable)
+	UImage* GetLocalImage() const;
+	
+	UFUNCTION(BLueprintCallable)
+	void EnableAudio(bool Enable);
+
+	UFUNCTION(BLueprintCallable)
+	void EnableVideo(bool Enable);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void LocalVideoStoped();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void LocalVideoStarted();
+
 protected:
 
 	IRtcEngine* RtcEngineProxy;
@@ -178,12 +202,11 @@ protected:
 
 	void CheckPermission();
 
+	UFUNCTION(BlueprintCallable)
 	void InitAgoraEngine(FString APP_ID, FString TOKEN, FString CHANNEL_NAME);
 	void UnInitAgoraEngine();
 	void NativeDestruct() override;
 
 
-
 	TSharedPtr<FUserRtcEventHandler> UserRtcEventHandler;
-
 };

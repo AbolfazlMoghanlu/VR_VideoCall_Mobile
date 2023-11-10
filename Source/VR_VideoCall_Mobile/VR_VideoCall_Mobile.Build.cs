@@ -8,7 +8,7 @@ public class VR_VideoCall_Mobile : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "MyShaderLibrary", "AgoraExample" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "MyShaderLibrary", "AgoraExample", "AndroidPermission" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
