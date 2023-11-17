@@ -27,15 +27,15 @@ UAsyncHttpRequest::UAsyncHttpRequest()
 	}
 }
 
-UAsyncHttpRequest* UAsyncHttpRequest::HttpRequest(FString URL)
+UAsyncHttpRequest* UAsyncHttpRequest::HttpRequest(FString URL, TMap<FString, FString> Headers)
 {
 	UAsyncHttpRequest* HttpTask = NewObject<UAsyncHttpRequest>();
-	HttpTask->Start(URL);
+	HttpTask->Start(URL, Headers);
 
 	return HttpTask;
 }
 
-void UAsyncHttpRequest::Start(FString URL)
+void UAsyncHttpRequest::Start(FString URL, TMap<FString, FString> Headers)
 {
 #if !UE_SERVER
 	// Create the Http request and add to pending request list
@@ -44,6 +44,12 @@ void UAsyncHttpRequest::Start(FString URL)
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &UAsyncHttpRequest::HandleHttpRequest);
 	HttpRequest->SetURL(URL);
 	HttpRequest->SetVerb(TEXT("GET"));
+
+	for (auto Header : Headers)
+	{
+		HttpRequest->SetHeader(Header.Key, Header.Value);
+	}
+
 	HttpRequest->ProcessRequest();
 #else
 	// On the server we don't execute fail or success we just don't fire the request.
@@ -100,6 +106,8 @@ void UAsyncHttpRequest::HandleHttpRequest(FHttpRequestPtr HttpRequest, FHttpResp
 		FString Result = HttpResponse->GetContentAsString();
 
 		OnSuccess.Broadcast(Result);
+
+		return;
 	}
 
 	

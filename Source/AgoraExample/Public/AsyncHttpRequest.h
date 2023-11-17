@@ -23,7 +23,7 @@ public:
 	UAsyncHttpRequest();
 
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true"))
-	static UAsyncHttpRequest* HttpRequest(FString URL);
+	static UAsyncHttpRequest* HttpRequest(FString URL, TMap<FString, FString> Headers);
 
 public:
 
@@ -35,7 +35,7 @@ public:
 
 public:
 
-	void Start(FString URL);
+	void Start(FString URL, TMap<FString, FString> Headers);
 
 private:
 
