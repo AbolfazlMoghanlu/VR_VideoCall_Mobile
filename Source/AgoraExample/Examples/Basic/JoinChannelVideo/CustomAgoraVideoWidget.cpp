@@ -427,3 +427,17 @@ void UCustomAgoraVideoWidget::RenewToken(FString NewToken)
 {
 	Token = NewToken;
 }
+
+void UCustomAgoraVideoWidget::ChangeVideoConfig(int32 ResX, int32 ResY, int BitRate)
+{
+	VideoEncoderConfiguration videoEncoderConfiguration;
+
+	VideoDimensions videoDimensions(ResX, ResY);
+	videoEncoderConfiguration.dimensions = videoDimensions;
+	videoEncoderConfiguration.bitrate = BitRate;
+
+	int ret = RtcEngineProxy->setVideoEncoderConfiguration(videoEncoderConfiguration);
+
+	FVideoViewIdentity LocalVideoFrameIdentity(VIDEO_SOURCE_CAMERA);
+	UBFL_VideoViewManager::ChangeSizeForOneVideoView(LocalVideoFrameIdentity, ResX, ResY, VideoViewMap);
+}

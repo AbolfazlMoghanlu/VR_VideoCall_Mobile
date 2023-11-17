@@ -195,6 +195,9 @@ public:
 	UFUNCTION(BLueprintCallable)
 	void RenewToken(FString NewToken);
 
+	UFUNCTION(BLueprintCallable)
+	void ChangeVideoConfig(int32 ResX, int32 ResY, int BitRate);
+
 protected:
 
 	IRtcEngine* RtcEngineProxy;
