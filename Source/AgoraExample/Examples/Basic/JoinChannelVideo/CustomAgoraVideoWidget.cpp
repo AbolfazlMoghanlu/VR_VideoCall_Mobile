@@ -409,7 +409,7 @@ void UCustomAgoraVideoWidget::EnableAudio(bool Enable)
 	{
 		RtcEngineProxy->disableAudio();
 	}
-}
+}	
 
 void UCustomAgoraVideoWidget::EnableVideo(bool Enable)
 {
@@ -421,4 +421,9 @@ void UCustomAgoraVideoWidget::EnableVideo(bool Enable)
 	{
 		RtcEngineProxy->disableVideo();
 	}
+}
+
+void UCustomAgoraVideoWidget::RenewToken(FString NewToken)
+{
+	Token = NewToken;
 }

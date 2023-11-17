@@ -192,6 +192,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void LocalVideoStarted();
 
+	UFUNCTION(BLueprintCallable)
+	void RenewToken(FString NewToken);
+
 protected:
 
 	IRtcEngine* RtcEngineProxy;
