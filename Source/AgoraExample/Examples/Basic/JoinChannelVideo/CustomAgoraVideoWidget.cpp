@@ -5,8 +5,6 @@
 
 void UCustomAgoraVideoWidget::InitAgoraWidget(FString APP_ID, FString TOKEN, FString CHANNEL_NAME)
 {
-	LogMsgViewPtr = UBFL_Logger::CreateLogView(CanvasPanel_LogMsgView, DraggableLogMsgViewTemplate);
-
 	CheckPermission();
 
 	InitAgoraEngine(APP_ID, TOKEN, CHANNEL_NAME);
@@ -45,10 +43,10 @@ void UCustomAgoraVideoWidget::InitAgoraEngine(FString APP_ID, FString TOKEN, FSt
 	RtcEngineProxy = agora::rtc::ue::createAgoraRtcEngine();
 	int SDKBuild = 0;
 	FString SDKInfo = FString::Printf(TEXT("SDK Version: %s Build: %d"), UTF8_TO_TCHAR(RtcEngineProxy->getVersion(&SDKBuild)), SDKBuild);
-	UBFL_Logger::Print(FString::Printf(TEXT("SDK Info:  %s"), *SDKInfo), LogMsgViewPtr);
+	UBFL_Logger::Print(FString::Printf(TEXT("SDK Info:  %s"), *SDKInfo), nullptr);
 
 	int ret = RtcEngineProxy->initialize(RtcEngineContext);
-	UBFL_Logger::Print(FString::Printf(TEXT("%s initialize ret %d"), *FString(FUNCTION_MACRO), ret), LogMsgViewPtr);
+	UBFL_Logger::Print(FString::Printf(TEXT("%s initialize ret %d"), *FString(FUNCTION_MACRO), ret), nullptr);
 }
 
 
@@ -60,77 +58,29 @@ void UCustomAgoraVideoWidget::UnInitAgoraEngine()
 		RtcEngineProxy->unregisterEventHandler(UserRtcEventHandler.Get());
 		RtcEngineProxy->release();
 		RtcEngineProxy = nullptr;
-		UBFL_Logger::Print(FString::Printf(TEXT("%s release agora engine"), *FString(FUNCTION_MACRO)), LogMsgViewPtr);
+		UBFL_Logger::Print(FString::Printf(TEXT("%s release agora engine"), *FString(FUNCTION_MACRO)), nullptr);
 	}
 }
 
 void UCustomAgoraVideoWidget::OnBtnJoinChannelClicked()
 {
-	RtcEngineProxy->enableAudio();
-	RtcEngineProxy->enableVideo();
-	int ret = RtcEngineProxy->joinChannel(TCHAR_TO_UTF8(*Token), TCHAR_TO_UTF8(*ChannelName), "", 0);
-	UBFL_Logger::Print(FString::Printf(TEXT("%s ret %d"), *FString(FUNCTION_MACRO), ret), LogMsgViewPtr);
-	RtcEngineProxy->setClientRole(agora::rtc::CLIENT_ROLE_TYPE::CLIENT_ROLE_BROADCASTER);
+	if (RtcEngineProxy)
+	{
+		RtcEngineProxy->enableAudio();
+		RtcEngineProxy->enableVideo();
+		int ret = RtcEngineProxy->joinChannel(TCHAR_TO_UTF8(*Token), TCHAR_TO_UTF8(*ChannelName), "", 0);
+		UBFL_Logger::Print(FString::Printf(TEXT("%s ret %d"), *FString(FUNCTION_MACRO), ret), nullptr);
+		RtcEngineProxy->setClientRole(agora::rtc::CLIENT_ROLE_TYPE::CLIENT_ROLE_BROADCASTER);
+	}
 }
 
 void UCustomAgoraVideoWidget::OnBtnLeaveChannelClicked()
 {
-	int ret = RtcEngineProxy->leaveChannel();
-	UBFL_Logger::Print(FString::Printf(TEXT("%s ret %d"), *FString(FUNCTION_MACRO), ret), LogMsgViewPtr);
-}
-
-void UCustomAgoraVideoWidget::OnBtnStartPublishClicked()
-{
-	ChannelMediaOptions options;
-	options.publishMicrophoneTrack = true;
-	options.publishCameraTrack = true;
-	int ret = RtcEngineProxy->updateChannelMediaOptions(options);
-}
-
-void UCustomAgoraVideoWidget::OnBtnStopPublishClicked()
-{
-	ChannelMediaOptions options;
-	options.publishMicrophoneTrack = false;
-	options.publishCameraTrack = false;
-	int ret = RtcEngineProxy->updateChannelMediaOptions(options);
-	UBFL_Logger::Print(FString::Printf(TEXT("%s updateChannelMediaOptions ret %d"), *FString(FUNCTION_MACRO), ret), LogMsgViewPtr);
-}
-
-void UCustomAgoraVideoWidget::OnBtnVideoConfigConfirmClicked()
-{
-	VideoEncoderConfiguration videoEncoderConfiguration;
-
-	FString TxtFPS = ET_FPS->GetText().ToString();
-	int ValFPS = FCString::Atoi(*TxtFPS);
-	videoEncoderConfiguration.frameRate = ValFPS;
-	UBFL_Logger::Print(FString::Printf(TEXT("%s frameRate=%d"), *FString(FUNCTION_MACRO), ValFPS), LogMsgViewPtr);
-
-	FString TxtWidth = ET_Width->GetText().ToString();
-	FString TxtHeight = ET_Height->GetText().ToString();
-	FString TxtBitRate = ET_BitRate->GetText().ToString();
-	int ValWidth = FCString::Atoi(*TxtWidth);
-	int ValHeight = FCString::Atoi(*TxtHeight);
-	int ValBitRate = FCString::Atoi(*TxtBitRate);
-	VideoDimensions videoDimensions(ValWidth, ValHeight);
-	videoEncoderConfiguration.dimensions = videoDimensions;
-	videoEncoderConfiguration.bitrate = ValBitRate;
-
-	UBFL_Logger::Print(FString::Printf(TEXT("%s Width=%d Height=%d"), *FString(FUNCTION_MACRO), ValWidth, ValHeight), LogMsgViewPtr);
-	UBFL_Logger::Print(FString::Printf(TEXT("%s Bitrate=%d"), *FString(FUNCTION_MACRO), ValBitRate), LogMsgViewPtr);
-
-	int ret = RtcEngineProxy->setVideoEncoderConfiguration(videoEncoderConfiguration);
-
-	FVideoViewIdentity LocalVideoFrameIdentity(VIDEO_SOURCE_CAMERA);
-	UBFL_VideoViewManager::ChangeSizeForOneVideoView(LocalVideoFrameIdentity,ValWidth,ValHeight, VideoViewMap);
-	
-	UBFL_Logger::Print(FString::Printf(TEXT("%s setVideoEncoderConfiguration ret %d"), *FString(FUNCTION_MACRO), ret), LogMsgViewPtr);
-
-}
-
-void UCustomAgoraVideoWidget::OnBtnBackToHomeClicked()
-{
-	UnInitAgoraEngine();
-	UGameplayStatics::OpenLevel(UGameplayStatics::GetPlayerController(GWorld, 0)->GetWorld(), FName("MainLevel"));
+	if (RtcEngineProxy)
+	{
+		int ret = RtcEngineProxy->leaveChannel();
+		UBFL_Logger::Print(FString::Printf(TEXT("%s ret %d"), *FString(FUNCTION_MACRO), ret), nullptr);
+	}
 }
 
 
@@ -139,8 +89,6 @@ void UCustomAgoraVideoWidget::NativeDestruct() {
 	Super::NativeDestruct();
 
 	UnInitAgoraEngine();
-
-	
 }
 
 
@@ -148,16 +96,6 @@ void UCustomAgoraVideoWidget::NativeDestruct() {
 
 int UCustomAgoraVideoWidget::MakeVideoView(uint32 uid, agora::rtc::VIDEO_SOURCE_TYPE sourceType /*= VIDEO_SOURCE_CAMERA_PRIMARY*/, FString channelId /*= ""*/)
 {
-	/*
-		For local view:
-			please reference the callback function Ex.[onCaptureVideoFrame]
-
-		For remote view:
-			please reference the callback function [onRenderVideoFrame]
-
-		channelId will be set in [setupLocalVideo] / [setupRemoteVideo]
-	*/
-
 	int ret = -ERROR_NULLPTR;
 
 	if (RtcEngineProxy == nullptr)
@@ -167,16 +105,18 @@ int UCustomAgoraVideoWidget::MakeVideoView(uint32 uid, agora::rtc::VIDEO_SOURCE_
 	videoCanvas.uid = uid;
 	videoCanvas.sourceType = sourceType;
 
-	if (uid == 0) {
+	if (uid == 0 && bMobileUser)
+	{
 		FVideoViewIdentity VideoViewIdentity(uid, sourceType, "");
-		videoCanvas.view = UBFL_VideoViewManager::CreateOneVideoViewToCanvasPanel(VideoViewIdentity, CanvasPanel_VideoView, VideoViewMap, DraggableVideoViewTemplate);
+
+		videoCanvas.view = CallView;
 		ret = RtcEngineProxy->setupLocalVideo(videoCanvas);
 	}
-	else
-	{
 
+	else if(uid != 0 && !bMobileUser)
+	{
 		FVideoViewIdentity VideoViewIdentity(uid, sourceType, channelId);
-		videoCanvas.view = UBFL_VideoViewManager::CreateOneVideoViewToCanvasPanel(VideoViewIdentity, CanvasPanel_VideoView, VideoViewMap, DraggableVideoViewTemplate);
+		videoCanvas.view = CallView;
 		
 		if(channelId == ""){
 			ret = RtcEngineProxy->setupRemoteVideo(videoCanvas);
@@ -204,15 +144,16 @@ int UCustomAgoraVideoWidget::ReleaseVideoView(uint32 uid, agora::rtc::VIDEO_SOUR
 	videoCanvas.uid = uid;
 	videoCanvas.sourceType = sourceType;
 
-	if (uid == 0) {
+
+	if (uid == 0 && bMobileUser)
+	{
 		FVideoViewIdentity VideoViewIdentity(uid, sourceType, "");
-		UBFL_VideoViewManager::ReleaseOneVideoView(VideoViewIdentity, VideoViewMap);
 		ret = RtcEngineProxy->setupLocalVideo(videoCanvas);
 	}
-	else
+
+	else if (uid != 0 && !bMobileUser)
 	{
 		FVideoViewIdentity VideoViewIdentity(uid, sourceType, channelId);
-		UBFL_VideoViewManager::ReleaseOneVideoView(VideoViewIdentity, VideoViewMap);
 		if (channelId == "") {
 			ret = RtcEngineProxy->setupRemoteVideo(videoCanvas);
 		}
@@ -223,6 +164,7 @@ int UCustomAgoraVideoWidget::ReleaseVideoView(uint32 uid, agora::rtc::VIDEO_SOUR
 			ret = ((agora::rtc::IRtcEngineEx*)RtcEngineProxy)->setupRemoteVideoEx(videoCanvas, connection);
 		}
 	}
+
 	return ret;
 }
 
@@ -244,9 +186,8 @@ void UCustomAgoraVideoWidget::FUserRtcEventHandler::onJoinChannelSuccess(const c
 				UBFL_Logger::PrintError(FString::Printf(TEXT("%s bIsDestruct "), *FString(FUNCTION_MACRO))); \
 				return;
 			}
-			UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), WidgetPtr->GetLogMsgViewPtr());
+			UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), nullptr);
 			WidgetPtr->MakeVideoView(0, agora::rtc::VIDEO_SOURCE_TYPE::VIDEO_SOURCE_CAMERA);
-
 	});
 }
 
@@ -263,8 +204,13 @@ void UCustomAgoraVideoWidget::FUserRtcEventHandler::onUserJoined(agora::rtc::uid
 				UBFL_Logger::PrintError(FString::Printf(TEXT("%s bIsDestruct "), *FString(FUNCTION_MACRO)));
 				return;
 			}
-			UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), WidgetPtr->GetLogMsgViewPtr());
+			UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), nullptr);
 			WidgetPtr->MakeVideoView(uid, agora::rtc::VIDEO_SOURCE_TYPE::VIDEO_SOURCE_REMOTE);
+
+			if (uid != 0)
+			{
+				WidgetPtr->OnRemoteJoined();
+			}
 	});
 }
 
@@ -280,8 +226,13 @@ void UCustomAgoraVideoWidget::FUserRtcEventHandler::onUserOffline(agora::rtc::ui
 				UBFL_Logger::PrintError(FString::Printf(TEXT("%s bIsDestruct "), *FString(FUNCTION_MACRO)));
 				return;
 			}
-			UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), WidgetPtr->GetLogMsgViewPtr());
+			UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), nullptr);
 			WidgetPtr->ReleaseVideoView(uid, VIDEO_SOURCE_REMOTE);
+
+			if (uid != 0)
+			{
+				WidgetPtr->OnRemoteLeave();
+			}
 	});
 }
 
@@ -297,11 +248,9 @@ void UCustomAgoraVideoWidget::FUserRtcEventHandler::onVideoSizeChanged(VIDEO_SOU
 				UBFL_Logger::PrintError(FString::Printf(TEXT("%s bIsDestruct "), *FString(FUNCTION_MACRO)));
 				return;
 			}
-			UBFL_Logger::Print(FString::Printf(TEXT("%s uid=%d width=%d height=%d "), *FString(FUNCTION_MACRO), uid, width, height), WidgetPtr->GetLogMsgViewPtr());
+			UBFL_Logger::Print(FString::Printf(TEXT("%s uid=%d width=%d height=%d "), *FString(FUNCTION_MACRO), uid, width, height), nullptr);
 			
-			FVideoViewIdentity VideoViewIdentity(uid, sourceType, "");
-			UBFL_VideoViewManager::ChangeSizeForOneVideoView(VideoViewIdentity, width, height, WidgetPtr->VideoViewMap);
-			
+			FVideoViewIdentity VideoViewIdentity(uid, sourceType, "");		
 		});
 }
 
@@ -332,7 +281,15 @@ void UCustomAgoraVideoWidget::FUserRtcEventHandler::onRemoteVideoStateChanged(ui
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Remote video changed _ %i _ %i"), state, reason);
 
+			if (state == 0)
+			{
+				WidgetPtr->RemoteVideoStoped();
+			}
 
+			else
+			{
+				WidgetPtr->RemoteVideoStarted();
+			}
 		});
 }
 
@@ -348,56 +305,10 @@ void UCustomAgoraVideoWidget::FUserRtcEventHandler::onLeaveChannel(const agora::
 			UBFL_Logger::PrintError(FString::Printf(TEXT("%s bIsDestruct "), *FString(FUNCTION_MACRO)));
 			return;
 		}
-		UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), WidgetPtr->GetLogMsgViewPtr());
-
-		//WidgetPtr->ReleaseVideoView(0, agora::rtc::VIDEO_SOURCE_TYPE::VIDEO_SOURCE_CAMERA);
-
-// 		TArray<uint32> uids;
-// 
-// 
-// 		for (auto& map : WidgetPtr->VideoViewMap)
-// 		{
-// 			uids.AddUnique(map.Key.uid);
-// 		}
-// 
-// 		for (uint32 i : uids)
-// 		{
-// 			WidgetPtr->ReleaseVideoView(i, agora::rtc::VIDEO_SOURCE_TYPE::VIDEO_SOURCE_CAMERA);
-// 		}
-
-		UBFL_VideoViewManager::ReleaseAllVideoView(WidgetPtr->VideoViewMap);
-
+		UBFL_Logger::Print(FString::Printf(TEXT("%s "), *FString(FUNCTION_MACRO)), nullptr);
 	});
 }
 #pragma endregion
-
-
-
-UImage* UCustomAgoraVideoWidget::GetRemoteImage() const
-{
-	for(auto& View : VideoViewMap)
-	{
-		if(View.Key.uid != 0)
-		{
-			return View.Value->View;
-		}
-	}
-
-	return nullptr;
-}
-
-UImage* UCustomAgoraVideoWidget::GetLocalImage() const
-{
-	for(auto& View : VideoViewMap)
-	{
-		if(View.Key.uid == 0)
-		{
-			return View.Value->View;
-		}
-	}
-
-	return nullptr;
-}
 
 void UCustomAgoraVideoWidget::EnableAudio(bool Enable)
 {
@@ -430,14 +341,16 @@ void UCustomAgoraVideoWidget::RenewToken(FString NewToken)
 
 void UCustomAgoraVideoWidget::ChangeVideoConfig(int32 ResX, int32 ResY, int BitRate)
 {
-	VideoEncoderConfiguration videoEncoderConfiguration;
+	if(RtcEngineProxy)
+	{
+		VideoEncoderConfiguration videoEncoderConfiguration;
 
-	VideoDimensions videoDimensions(ResX, ResY);
-	videoEncoderConfiguration.dimensions = videoDimensions;
-	videoEncoderConfiguration.bitrate = BitRate;
+		VideoDimensions videoDimensions(ResX, ResY);
+		videoEncoderConfiguration.dimensions = videoDimensions;
+		videoEncoderConfiguration.bitrate = BitRate;
 
-	int ret = RtcEngineProxy->setVideoEncoderConfiguration(videoEncoderConfiguration);
+		int ret = RtcEngineProxy->setVideoEncoderConfiguration(videoEncoderConfiguration);
 
-	FVideoViewIdentity LocalVideoFrameIdentity(VIDEO_SOURCE_CAMERA);
-	UBFL_VideoViewManager::ChangeSizeForOneVideoView(LocalVideoFrameIdentity, ResX, ResY, VideoViewMap);
+		FVideoViewIdentity LocalVideoFrameIdentity(VIDEO_SOURCE_CAMERA);
+	}
 }
